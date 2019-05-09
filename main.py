@@ -100,6 +100,11 @@ for link in property_links:
             property_data['streetname'] = ' '.join(split_name)
             break
 
+    for part in property_data['streetname'].split():
+        if bool(re.search(r'\d', part)):
+            property_data['streetname'].remove(part)
+
+
     property_data['size'] = int(property_data['size'].split(' ')[0])
 
     property_data_list.append(property_data)
