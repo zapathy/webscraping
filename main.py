@@ -110,4 +110,3 @@ for link in property_links:
 print()
 print()
 print('done')
-print(property_data_list)
