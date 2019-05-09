@@ -36,7 +36,7 @@ while True:
     rightButton = soup.select('div[class*="text-right"]')[0].select('button')
     print('.', end='')
     sys.stdout.flush()
-    break #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!remove this
+
     if len(rightButton) != 0:
         url = rightButton[0]['onclick'].split("'")[1]
     else:
