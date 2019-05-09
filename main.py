@@ -87,12 +87,15 @@ for link in property_links:
 
     # property_data['contact'] = details.select('ul')[2].select('li')[1].contents[0]
 
-    recognized_suffixes = ['utca', 'út', 'tér']
-    recognized_suffixes_english = ['street', 'road', 'square']
+    recognized_suffixes = ['utca', 'út', 'tér', 'park']
+    recognized_suffixes_english = ['street', 'road', 'square', 'park']
     split_name = (str(property_data['name'])).split()
     for s in split_name:
-        if s in recognized_suffixes:
-            property_data['streetsuffix'] = s
+        if s in recognized_suffixes or s in recognized_suffixes_english:
+            if s in recognized_suffixes:
+                property_data['streetsuffix'] = s
+            if s in recognized_suffixes_english:
+                property_data['streetsuffix'] = recognized_suffixes[recognized_suffixes_english.index(s)]
             split_name.remove(s)
             property_data['streetname'] = ' '.join(split_name)
             break
