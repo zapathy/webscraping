@@ -42,12 +42,15 @@ for link in property_links:
     soup = bs4.BeautifulSoup(content, features="lxml")
     header = soup.select('div[class*="property-content"]')[0].select('h1')[0].contents[0]
     property_data['name'] = header
-    description = soup.select('div[class*="property-details-content-description"]')[0].select('p')[1].contents[0]
+    if len(soup.select('div[class*="property-details-content-description"]')[0].select('p')) > 1:
+        description = soup.select('div[class*="property-details-content-description"]')[0].select('p')[1].contents[0]
+    else:
+        description = soup.select('div[class*="property-details-content-description"]')[0].select('p')[0].contents[0]
     property_data['description'] = description
     details = soup.select('div[class*="property-details-sidebar"]')[0]
 
     for listitem in details.select('ul')[0].select('li'):
-        new_key = listitem.select('strong')[0].contents[0].replace(':', '')
+        new_key = listitem.select('strong')[0].contents[0].replace(':', '').lower()
         if (len(listitem.contents) > 1):
             new_value = listitem.contents[1]
         else:
@@ -69,5 +72,7 @@ for link in property_links:
             property_data['street_name'] = ' '.join(split_name)
             break
     property_data_list.append(property_data)
+    print(property_data)    
 
+print(property_data_list)
 
