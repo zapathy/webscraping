@@ -5,6 +5,7 @@ import numpy as np
 import psycopg2
 import re
 import sys
+import requests
 
 url = 'https://www.towerbudapest.com/en/sales'
 hdr = {
@@ -17,26 +18,45 @@ hdr = {
 
 property_links = []
 property_data_list = []
+soup = bs4.BeautifulSoup(urlopen(Request(url, headers=hdr)).read(), features="lxml")
+for paragraph in soup.select('p[class*="kill-margin"]'):
+    if 'Page' in str(paragraph.contents[0]):
+        total_pages = int(paragraph.contents[0].split(' ')[10])
+        break
+print("found " + str(total_pages) + " pages")
+for i in range(total_pages):
+    print('=', end='')
+print()
+
 while True:
-    content = urlopen(Request(url, headers=hdr)).read()
-    soup = bs4.BeautifulSoup(content, features="lxml")
+    soup = bs4.BeautifulSoup(urlopen(Request(url, headers=hdr)).read(), features="lxml")
     for tag in soup.findAll('a',
                             attrs={'href': re.compile("^https://www.towerbudapest.com/en/sales/budapest_property/")}):
         property_links.append(tag.get('href'))
     rightButton = soup.select('div[class*="text-right"]')[0].select('button')
     print('.', end='')
     sys.stdout.flush()
+    break #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!remove this
     if len(rightButton) != 0:
         url = rightButton[0]['onclick'].split("'")[1]
     else:
         print()
         break
-
+print()
 print("found " + str(len(property_links)) + " links")
 property_links = list(set(property_links))
 print(str(len(property_links)) + " after removing duplicates")
+for i in range(len(property_links)):
+    if i % 10 == 0:
+        print('=', end='')
+print()
+counter = 0
 
 for link in property_links:
+    counter += 1
+    if counter % 10 == 0:
+        print('.', end='')
+        sys.stdout.flush()
     property_data = {}
     content = urlopen(Request(link, headers=hdr)).read()
     soup = bs4.BeautifulSoup(content, features="lxml")
@@ -46,33 +66,46 @@ for link in property_links:
         description = soup.select('div[class*="property-details-content-description"]')[0].select('p')[1].contents[0]
     else:
         description = soup.select('div[class*="property-details-content-description"]')[0].select('p')[0].contents[0]
-    property_data['description'] = description
+    # property_data['description'] = description
     details = soup.select('div[class*="property-details-sidebar"]')[0]
 
     for listitem in details.select('ul')[0].select('li'):
-        new_key = listitem.select('strong')[0].contents[0].replace(':', '').lower()
-        if (len(listitem.contents) > 1):
-            new_value = listitem.contents[1]
+        new_key = listitem.select('strong')[0].contents[0].replace(':', '').lower().replace(' ', '')
+        if len(listitem.contents) > 1:
+            new_value = str(listitem.contents[1]).strip()
+            if new_value == 'Yes':
+                new_value = True
+            if new_value == 'No':
+                new_value = False
         else:
             new_value = True
         property_data[new_key] = new_value
 
-    property_data['Price_HUF'] = details.select('ul')[1].select('li')[1].contents[0].split()[0].replace('.', '')
+    property_data['pricehuf'] = details.select('ul')[1].select('li')[1].contents[0].split()[0].replace('.', '')
     if len(details.select('ul')[1].select('li')) > 2:
-        property_data['Price_EUR'] = details.select('ul')[1].select('li')[2].contents[0].split()[0].replace('.', '')
+        property_data['priceeur'] = details.select('ul')[1].select('li')[2].contents[0].split()[0].replace('.', '')
 
-    property_data['Contact'] = details.select('ul')[2].select('li')[1].contents[0]
+    # property_data['contact'] = details.select('ul')[2].select('li')[1].contents[0]
 
     recognized_suffixes = ['utca', 'út', 'tér']
+    recognized_suffixes_english = ['street', 'road', 'square']
     split_name = (str(property_data['name'])).split()
     for s in split_name:
-        if (s in recognized_suffixes):
-            property_data['street_suffix'] = s
+        if s in recognized_suffixes:
+            property_data['streetsuffix'] = s
             split_name.remove(s)
-            property_data['street_name'] = ' '.join(split_name)
+            property_data['streetname'] = ' '.join(split_name)
             break
+
+    property_data['size'] = int(property_data['size'].split(' ')[0])
+
     property_data_list.append(property_data)
-    print(property_data)    
+    r = requests.post("http://localhost:8080/properties", json=property_data)
+    # print(r.status_code, r.reason)
+    # print(r.text[:300] + '...')
+    print(property_data)
 
+print()
+print()
+print('done')
 print(property_data_list)
-
