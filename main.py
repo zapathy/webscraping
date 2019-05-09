@@ -103,7 +103,6 @@ for link in property_links:
     r = requests.post("http://localhost:8080/properties", json=property_data)
     # print(r.status_code, r.reason)
     # print(r.text[:300] + '...')
-    print(property_data)
 
 print()
 print()
