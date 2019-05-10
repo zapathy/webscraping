@@ -52,11 +52,14 @@ for i in range(len(property_links)):
 print()
 counter = 0
 
+status_codes = {}
 for link in property_links:
     counter += 1
     if counter % 10 == 0:
         print('.', end='')
         sys.stdout.flush()
+    # if counter > 20:
+    #     break
     property_data = {}
     content = urlopen(Request(link, headers=hdr)).read()
     soup = bs4.BeautifulSoup(content, features="lxml")
@@ -87,8 +90,10 @@ for link in property_links:
 
     # property_data['contact'] = details.select('ul')[2].select('li')[1].contents[0]
 
+    property_data['name'] = property_data['name'].lower()
     recognized_suffixes = ['utca', 'út', 'tér', 'park']
     recognized_suffixes_english = ['street', 'road', 'square', 'park']
+    recognized_suffixes_aliases = []
     split_name = (str(property_data['name'])).split()
     for s in split_name:
         if s in recognized_suffixes or s in recognized_suffixes_english:
@@ -104,9 +109,15 @@ for link in property_links:
 
     property_data_list.append(property_data)
     r = requests.post("http://localhost:8080/properties", json=property_data)
-    # print(r.status_code, r.reason)
-    # print(r.text[:300] + '...')
+    if r.status_code in status_codes:
+        status_codes[r.status_code] += 1
+    else:
+        status_codes[r.status_code] = 1
 
 print()
 print()
-print('done')
+print('done with status codes:')
+for c in status_codes:
+    print("\t" + str(c) + " x" + str(status_codes[c]))
+
+
