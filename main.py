@@ -58,7 +58,7 @@ for link in property_links:
     if counter % 10 == 0:
         print('.', end='')
         sys.stdout.flush()
-    # if counter > 20:
+    # if counter > 100:
     #     break
     property_data = {}
     content = urlopen(Request(link, headers=hdr)).read()
@@ -92,8 +92,11 @@ for link in property_links:
 
     property_data['name'] = property_data['name'].lower()
     recognized_suffixes = ['utca', 'út', 'tér', 'park']
+    recognized_suffix_aliases = [
+        ['utca','street'],
+        ['út', 'road'],
+        ['tér', 'square'], 'park']
     recognized_suffixes_english = ['street', 'road', 'square', 'park']
-    recognized_suffixes_aliases = []
     split_name = (str(property_data['name'])).split()
     for s in split_name:
         if s in recognized_suffixes or s in recognized_suffixes_english:
