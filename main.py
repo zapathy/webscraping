@@ -1,8 +1,5 @@
-from urllib.request import urlopen, Request, HTTPError
+from urllib.request import urlopen, Request
 import bs4
-import pandas as pd
-import numpy as np
-import psycopg2
 import re
 import sys
 import requests
@@ -123,6 +120,3 @@ def main():
     print('done with status codes:')
     for c in status_codes:
         print("\t" + str(c) + " x" + str(status_codes[c]))
-
-
-
