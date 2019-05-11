@@ -111,7 +111,7 @@ for link in property_links:
     property_data['size'] = int(property_data['size'].split(' ')[0])
 
     property_data_list.append(property_data)
-    r = requests.post("http://localhost:8080/properties", json=property_data)
+    r = requests.post("https://propertybuddy-database.herokuapp.com/properties", json=property_data)
     if r.status_code in status_codes:
         status_codes[r.status_code] += 1
     else:
