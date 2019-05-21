@@ -103,7 +103,8 @@ def main():
             property_data['size'] = int(property_data['size'].split(' ')[0])
 
             property_data_list.append(property_data)
-            r = requests.post("https://propertybuddy-database.herokuapp.com/properties", json=property_data)
+            # r = requests.post("https://propertybuddy-database.herokuapp.com/properties", json=property_data)
+            r = requests.post("http://localhost:8080/properties", json=property_data)
 
             latest_status_code = (r.status_code, json.loads(r.content)['message'])
             if latest_status_code in status_codes:
