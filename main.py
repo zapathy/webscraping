@@ -115,7 +115,9 @@ def main():
             else:
                 status_codes[latest_status_code] = 1
         except Exception as e:
-            latest_exception = str(e).split("(Caused")[0]
+            latest_exception = str(e)
+            if "HTTPConnectionPool" in latest_exception and "Max retries exceeded with url" in latest_exception:
+                latest_exception = latest_exception.split("(Caused")[0]
             if latest_exception in exceptions:
                 exceptions[latest_exception] += 1
             else:
@@ -132,7 +134,7 @@ def end_print():
         print("\t" + str(c[0]) + " x" + "\t" + str(status_codes[c]) + "\n\t\t" + str(c[1]))
     print('exceptions:')
     for e in exceptions:
-        print("\t" + str(e[0]) + " x" + "\t" + str(exceptions[e]) + "\n\t\t" + str(e[1]))
+        print("\t" + e + " x" + "\t" + str(exceptions[e]))
 
 
 try:
