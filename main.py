@@ -6,6 +6,9 @@ from urllib.request import urlopen, Request
 import bs4
 import requests
 
+exceptions = {}
+status_codes = {}
+
 
 def main():
     global total_pages
@@ -52,8 +55,8 @@ def main():
             print('=', end='')
     print()
     counter = 0
-    status_codes = {}
-    exceptions = []
+    global status_codes
+    global exceptions
     for link in property_links:
         try:
             counter += 1
@@ -112,17 +115,30 @@ def main():
             else:
                 status_codes[latest_status_code] = 1
         except Exception as e:
-            exceptions.append(e)
-            pass
+            latest_exception = str(e).split("(Caused")[0]
+            if latest_exception in exceptions:
+                exceptions[latest_exception] += 1
+            else:
+                exceptions[latest_exception] = 1
     print()
     print()
-    print('done with status codes:')
+    print('all done')
+    end_print()
+
+
+def end_print():
+    print('status codes:')
     for c in status_codes:
-        print(str(c[0]) + " x" + "\t" + str(status_codes[c]) + "\n\t" + str(c[1]))
-    print()
-    print('and exceptions:')
+        print("\t" + str(c[0]) + " x" + "\t" + str(status_codes[c]) + "\n\t\t" + str(c[1]))
+    print('exceptions:')
     for e in exceptions:
-        print(e)
+        print("\t" + str(e[0]) + " x" + "\t" + str(exceptions[e]) + "\n\t\t" + str(e[1]))
 
 
-main()
+try:
+    main()
+except KeyboardInterrupt:
+    print()
+    print()
+    print('exiting on user interrupt')
+    end_print()
