@@ -131,10 +131,10 @@ def main():
 def end_print():
     print('status codes:')
     for c in status_codes:
-        print("\t" + str(c[0]) + " x" + "\t" + str(status_codes[c]) + "\n\t\t" + str(c[1]))
+        print("\t" + str(c[0]) + "\tx" + str(status_codes[c]) + "\n\t\t" + str(c[1]))
     print('exceptions:')
     for e in exceptions:
-        print("\t" + e + " x" + "\t" + str(exceptions[e]))
+        print("\t" + e + "\tx" + str(exceptions[e]))
 
 
 try:
